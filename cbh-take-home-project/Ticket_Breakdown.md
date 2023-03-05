@@ -22,19 +22,19 @@ You will be graded on the level of detail in each ticket, the clarity of the exe
 
 #### Task:
 
-A facility can assign an external id to an internal id for an agent.
+A facility can assign an external id to an internal id of an agent.
 This would require a db table where we can map a facility id and internal agent id to a new external agent id.
 
 #### Implementation details:
 
-Perform database migration to add a new table agent_external _id. This table will have the following columns:
-facility_id, agent_internal_id, external_id.
+Perform database migration to add a new table agent_id_mapping. This table will have the following columns:
+facility_id, agent_internal_id, agent_external_id.
 
-facility_id and agent_internal_id together will be unique and will act as the primary key for the table. The reason is that an agent can work for multiple facilities and if an agent worked for a facility then facility_id and agent_internal_id together denotes the  relationship.
+facility_id and agent_internal_id together will be unique and will act as the primary key for the table. The reason is that an agent can work for multiple facilities and if an agent worked for a facility then facility_id and agent_internal_id together denotes that relationship.
 
 #### Acceptance criteria:
 
-The agent_external _id table should created in dev, QA and prod env.
+The agent_id_mapping table should created in dev, QA and prod env.
 
 #### Effort:
 
@@ -46,25 +46,25 @@ The agent_external _id table should created in dev, QA and prod env.
 
 #### Task: 
 
-Since facilities can generate external_id for an agent we need to create an API interface that can perform this action. Also create an API to get agent_internal_id for a given agent_external_id.
+Since facilities can assign agent_external_id to an agent we need to create an API interface that can perform this action. Also create an API to get agent_external_id for a given agent_internal_id and facility_id.
 
 #### Implementation details:
 
 Create an POST API in backend service with the following functionality.
-Request: POST with the form details as facility_id, agent_internal_id, agent_external_id.
-Action: Save facility_id, agent_internal_id, external_id as a row in agent_external _id table. This assumes that Ticket 1 have been done and there is already a agent_external _id table in the db.
+Request: POST with the form fields "facility_id, agent_internal_id, agent_external_id".
+Action: Save "facility_id, agent_internal_id, agent_external_id" as a row in agent_id_mapping table. This assumes that Ticket 1 have been done and there is already a agent_id_mapping table in the db.
 Response: HTTP_OK 200 if request is processed successfully else send back HTTP ERROR codes depending on the error types.
 
 Also create a GET API in the backend service with the following functionality.
-Request: GET  Input:  agent_external_id
+Request: GET  Input:  agent_internal_id, facility_id
 
-Action: Search for the  external _id in agent_external_id table. Send back the agent_internal _id .
-Response: HTTP_OK 200 if request is processed successfully else send back HTTP ERROR codes depending on the error types.
+Action: Search for the  agent_internal_id and facility_id in agent_id_mapping table. Send back the corresponding agent_external_id .
+Response: HTTP_OK 200 and agent_external_id if request is processed successfully else send back HTTP ERROR codes depending on the error types.
 
 
 #### Acceptance criteria:
 
-The code changes along with unit tests should be merged to main branch. Testing should be done in Dev env to make sure the API is working as expected.
+The code changes along with unit tests should be merged to main branch. Testing should be done in Dev env to make sure the APIs are working as expected.
 
 #### Effort:
 
@@ -86,7 +86,7 @@ When a facility assigns an external_agent_id to an agent call the API that is im
 
 #### Acceptance criteria:
 
-The code changes along with unit tests should be merged to main branch. Testing should be done in Dev env to make sure a facility can assign an external_id to the agent_internal_id from  front end and the mapping is saved to the DB in dev.
+The code changes along with unit tests should be merged to main branch. Testing should be done in Dev env to make sure a facility can assign an agent_external_id to the agent_internal_id from  front end and the mapping is saved to the DB in dev.
 
 #### Effort:
 
@@ -98,12 +98,12 @@ The code changes along with unit tests should be merged to main branch. Testing 
 
 #### Task:
 
-Since the repost needs to use external_id perform the code change to use external_id in generateReport.
+Since the report needs to use agent_external_id perform the code change to use agent_external_id instead of agent_internal_id in generateReport.
 
 #### Implementation details:
 
-generateReport function is currently generating report for the facility. This function uses internal_id for the agent. We need to change the function to use external_id for the agent. Use the GET API implemented in Ticket 3 to GET an external_id for an internal_id for agents. This will means find all the agent internal_id in the report, find external_id for each of the agent internal_id and replace the internal_id to external_id wherever needed.
-Use feature flag to add this feature in backend. This will make sure we are able to of testing for selective facilities first before making it GA for all facilities.
+generateReport function is currently generating report for the facility. This function uses internal_id for the agent. We need to change the function to use external_id for the agent. Use the GET API implemented in Ticket 3 to GET an external_id for an internal_id for all agents. This will means getting all the agent internal_id in the report, find external_id for each of the agent internal_id and replace the internal_id to external_id wherever needed.
+Use feature flag to add this feature in backend. Feature flag will make sure we are able to do testing for selective facilities first before making it GA for all facilities.
 
 #### Acceptance criteria:
 
